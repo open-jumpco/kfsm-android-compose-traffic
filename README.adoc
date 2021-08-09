@@ -21,7 +21,7 @@ image:traffic-light-model.png[]
 
 === Traffic Intersection Classes
 
-image:traffic-intersection.png[]
+image:traffic-intersection-model.png[]
 
 == Generated Traffic Light Models
 
