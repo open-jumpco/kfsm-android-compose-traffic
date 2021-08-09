@@ -1,0 +1,96 @@
+@startuml
+enum IntersectionStates {
+    LEFT_STOPPING
+    LEFT_WAITING
+    LEFT_GOING
+    RIGHT_STOPPING
+    RIGHT_WAITING
+    RIGHT_GOING
+    STOPPED
+}
+
+enum IntersectionEvents {
+    SWITCH,
+    STOPPED,
+    STOP,
+    START
+}
+
+interface TrafficIntersection {
+    val leftCycleTime: Long
+    val rightCycleTime: Long
+    val cycleWaitTime: Long
+    setNotifyStateChange(receiver: suspend (newState: IntersectionStates) -> Unit)
+    stateChanged(toState: IntersectionStates) <<suspend>>
+    goRight() <<suspend>>
+    goLeft() <<suspend>>
+    stopLeft() <<suspend>>
+    stopRight() <<suspend>>
+}
+
+class TrafficIntersectionFSM {
+    val currentState: IntersectionStates
+    start() <<suspend>>
+    stop() <<suspend>>
+    switch() <<suspend>>
+    stopped() <<suspend>>
+    allowedEvents(): Set<IntersectionEvents>
+}
+
+TrafficIntersectionFSM --> TrafficIntersection: context
+TrafficIntersectionFSM .up.> IntersectionEvents: events <<uses>>
+TrafficIntersectionFSM .left.> IntersectionStates: states <<uses>>
+
+class TrafficIntersectionImplementation {
+    leftCycleTime: Long
+    rightCycleTime: Long
+    cycleWaitTime: Long
+    setNotifyStopped(receiver: suspend () -> Unit)
+    changeLeftCycleTime(value: Long)
+    changeRightCycleTime(value: Long)
+    changeCycleWaitTime(value: Long)
+    setNotifyStateChange(receiver: suspend (newState: IntersectionStates) -> Unit)
+    stateChanged(toState: IntersectionStates)
+    goRight()
+    goLeft()
+    stopLeft()
+    stopRight()
+}
+
+TrafficIntersectionImplementation --|> TrafficIntersection
+TrafficIntersectionImplementation *--> TrafficLightFSM: rightFSM <<private>>
+TrafficIntersectionImplementation *--> TrafficLightFSM: leftFSM <<private>>
+TrafficIntersectionImplementation *--> TrafficLightModel: left
+TrafficIntersectionImplementation *--> TrafficLightModel: right
+
+TrafficLightModel *--> TrafficLightFSM
+
+class TrafficIntersectionModel {
+
+    val intersectionState: LiveData<IntersectionStates>
+    val leftCycleTime: Long
+
+    val cycleWaitTime: Long
+    val allowStart: LiveData<Boolean>
+    val allowSwitch: LiveData<Boolean>
+    val allowStop: LiveData<Boolean>
+    val leftAmberTimeout: Long
+    val rightAmberTimeout: Long
+
+    setNotifyStateChange(receiver: suspend (newState: IntersectionStates) -> Unit)
+    stateChanged(toState: IntersectionStates) <<suspend>>
+    changeLeftCycle(value: Long)
+    changeLeftAmberTimeout(value: Long)
+    changeRightCycle(value: Long)
+    changeRightAmberTimeout(value: Long)
+
+    start() <<suspend>>
+    stop() <<suspend>>
+    switch() <<suspend>>
+}
+TrafficIntersectionModel -up-|> ViewModel
+TrafficIntersectionModel *-left-> TrafficIntersectionFSM: intersectionFSM <<private>>
+TrafficIntersectionModel *--> TrafficLightModel: left
+TrafficIntersectionModel *--> TrafficLightModel: right
+TrafficIntersectionModel -down-|> TrafficIntersectionImplementation: <<delegation>>
+@enduml
