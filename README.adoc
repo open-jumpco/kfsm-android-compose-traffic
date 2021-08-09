@@ -9,9 +9,9 @@ The application illustrates how to create a view models that uses `LiveData` to 
 
 == Demo
 
-video::1t9RnUg0Glw[youtube]
+video::kfsm-android-compose.mp4[poster=demo.png,options=loop]
 
-link:kfsm-android-compose.mp4[Demo Video]
+link:kfsm-android-compose.mp4[Demo Video Download]
 
 == Class Diagrams
 
