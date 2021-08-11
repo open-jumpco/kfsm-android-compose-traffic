@@ -25,16 +25,16 @@ image:demo3.gif[Three Traffic Lights]
 
 == Traffic Intersection Classes
 
-image:traffic-intersection-model.png[]
+image:traffic-intersection-model.svg[Static]
 
 == Generated Traffic Light Models
 
-image:traffic-light.png[]
+image:traffic-light.svg[Static]
 
 include::generated/traffic-light.adoc[]
 
 == Generated Intersection Models
 
-image:traffic-intersection.png[]
+image:traffic-intersection.svg[Static]
 
 include::generated/traffic-intersection.adoc[]
