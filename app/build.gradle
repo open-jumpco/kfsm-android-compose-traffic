@@ -3,6 +3,8 @@ plugins {
     id 'kotlin-android'
 }
 
+apply plugin: 'io.jumpco.open.kfsm.viz-plugin'
+
 android {
     compileSdk 30
 
@@ -75,3 +77,19 @@ dependencies {
 
 }
 
+kfsmViz {
+    fsm('TrafficLightFSM') {
+        input = file('src/main/java/com/example/kfsm/compose/trafficlight/TrafficLightFSM.kt')
+        output = 'traffic-light'
+        outputFolder = new File(rootProject.projectDir, 'generated')
+        isGeneratePlantUml = true
+        isGenerateAsciidoc = true
+    }
+    fsm('TrafficIntersectionFSM') {
+        input = file('src/main/java/com/example/kfsm/compose/trafficlight/TrafficIntersectionFSM.kt')
+        output = 'traffic-intersection'
+        outputFolder = new File(rootProject.projectDir, 'generated')
+        isGeneratePlantUml = true
+        isGenerateAsciidoc = true
+    }
+}

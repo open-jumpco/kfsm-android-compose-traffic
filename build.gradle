@@ -19,27 +19,13 @@ buildscript {
         // in the individual module build.gradle files
     }
 }
+
 plugins {
     id 'io.jumpco.open.kfsm.viz-plugin' version '1.5.1'
 
 }
+
 task clean(type: Delete) {
     delete rootProject.buildDir
-}
-
-kfsmViz {
-    fsm('TrafficLightFSM') {
-        input = file('app/src/main/java/com/example/kfsm/compose/trafficlight/TrafficLightFSM.kt')
-        output = 'traffic-light'
-        outputFolder = file('generated')
-        isGeneratePlantUml = true
-        isGenerateAsciidoc = true
-    }
-    fsm('TrafficIntersectionFSM') {
-        input = file('app/src/main/java/com/example/kfsm/compose/trafficlight/TrafficIntersectionFSM.kt')
-        output = 'traffic-intersection'
-        outputFolder = file('generated')
-        isGeneratePlantUml = true
-        isGenerateAsciidoc = true
-    }
+    delete file('generated')
 }
