@@ -1,0 +1,115 @@
+== TrafficIntersectionFSM State Chart
+
+=== TrafficIntersectionFSM State Map
+
+|===
+| Start | Event[Guard] | Target | Action
+
+| STOPPED
+| START
+| GOING
+a| [source,kotlin]
+----
+{
+start()
+}
+----
+
+| STOPPED
+| STOPPED
+| STOPPED
+a| [source,kotlin]
+----
+{
+}
+----
+
+| GOING
+| \<<timeout = {cycleTime}>>
+| STOPPING
+a| [source,kotlin]
+----
+{
+stop()
+}
+----
+
+| GOING
+| SWITCH
+| STOPPING
+a| [source,kotlin]
+----
+{
+stop()
+}
+----
+
+| GOING
+| STOP
+| STOPPED
+a| [source,kotlin]
+----
+{
+stop()
+}
+----
+
+| STOPPING
+| STOPPED
+| WAITING
+a| [source,kotlin]
+----
+{
+}
+----
+
+| STOPPING
+| SWITCH
+| WAITING
+a| [source,kotlin]
+----
+{
+}
+----
+
+| STOPPING
+| STOP
+| STOPPED
+a| [source,kotlin]
+----
+{
+stop()
+}
+----
+
+| WAITING
+| \<<timeout = {cycleWaitTime}>>
+| GOING
+a| [source,kotlin]
+----
+{
+next()
+start()
+}
+----
+
+| WAITING
+| SWITCH
+| WAITING
+a| [source,kotlin]
+----
+{
+}
+----
+
+| WAITING
+| STOP
+| STOPPED
+a| [source,kotlin]
+----
+{
+stop()
+}
+----
+|===
+

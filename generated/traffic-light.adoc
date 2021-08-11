@@ -1,0 +1,63 @@
+== TrafficLightFSM State Chart
+
+=== TrafficLightFSM State Map
+
+|===
+| Start | Event[Guard] | Target | Action
+
+| RED
+| GO
+| GREEN
+a| [source,kotlin]
+----
+{
+switchRed(false)
+switchGreen(true)
+}
+----
+
+| RED
+| STOP
+| RED
+a| [source,kotlin]
+----
+{
+switchGreen(false)
+switchAmber(false)
+switchRed(true)
+}
+----
+
+| AMBER
+| \<<timeout = {amberTimeout}>>
+| RED
+a| [source,kotlin]
+----
+{
+switchAmber(false)
+switchRed(true)
+stopped()
+}
+----
+
+| AMBER
+| STOP
+| AMBER
+a| [source,kotlin]
+----
+{
+}
+----
+
+| GREEN
+| STOP
+| AMBER
+a| [source,kotlin]
+----
+{
+switchGreen(false)
+switchAmber(true)
+}
+----
+|===
+

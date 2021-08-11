@@ -1,0 +1,20 @@
+@startuml
+skinparam StateFontName Helvetica
+skinparam defaultFontName Monospaced
+skinparam state {
+    BackgroundColor LightBlue
+}
+state TrafficIntersectionFSM {
+STOPPED --> GOING : START\l<<action>> {\lstart()\l}
+STOPPED --> STOPPED : STOPPED\l<<action>> {\l}
+GOING --> STOPPING : <<timeout = {cycleTime}>>\l<<action>> {\lstop()\l}
+GOING --> STOPPING : SWITCH\l<<action>> {\lstop()\l}
+GOING --> STOPPED : STOP\l<<action>> {\lstop()\l}
+STOPPING --> WAITING : STOPPED\l<<action>> {\l}
+STOPPING --> WAITING : SWITCH\l<<action>> {\l}
+STOPPING --> STOPPED : STOP\l<<action>> {\lstop()\l}
+WAITING --> GOING : <<timeout = {cycleWaitTime}>>\l<<action>> {\lnext()\lstart()\l}
+WAITING --> WAITING : SWITCH\l<<action>> {\l}
+WAITING --> STOPPED : STOP\l<<action>> {\lstop()\l}
+}
+@enduml
