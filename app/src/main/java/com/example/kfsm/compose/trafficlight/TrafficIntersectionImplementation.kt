@@ -21,6 +21,7 @@ open class TrafficIntersectionImplementation(
     var _amberTimeout: Long = 2000L
 
     init {
+        require(lights.isNotEmpty()) { "At least one light is required" }
         _current = (lights[0] ?: error("expected lights not empty"))
         _currentName = _current.name
 
