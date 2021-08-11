@@ -16,8 +16,12 @@ enum class TrafficLightEvents {
 interface TrafficLight {
     val name: String
     val amberTimeout: Long
+    val amber: Boolean
+    val red: Boolean
+    val green: Boolean
     fun setNotifyStopped(receiver: suspend () -> Unit)
     fun setNotifyStateChange(receiver: suspend (newState: TrafficLightStates) -> Unit)
+    fun changeAmberTimeout(value: Long)
     suspend fun stopped()
     suspend fun switchRed(on: Boolean)
     suspend fun switchAmber(on: Boolean)

@@ -13,13 +13,7 @@ image:demo.gif[options=loop]
 
 link:kfsm-android-compose.mp4[Demo Video Download]
 
-== Class Diagrams
-
-=== Traffic Light Classes
-
-image:traffic-light-model.png[]
-
-=== Traffic Intersection Classes
+== Traffic Intersection Classes
 
 image:traffic-intersection-model.png[]
 

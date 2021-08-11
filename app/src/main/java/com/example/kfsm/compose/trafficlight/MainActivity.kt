@@ -3,8 +3,8 @@ package com.example.kfsm.compose.trafficlight
 
 import android.content.res.Configuration
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
@@ -23,6 +23,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -34,14 +35,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
     private val intersectionModel = TrafficIntersectionModel()
+    private val intersectionViewModel = TrafficIntersectionViewModel(intersectionModel)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             KFSMComposeTrafficLightTheme {
                 Surface(color = MaterialTheme.colors.background) {
-                    Intersection(intersectionModel)
+                    Intersection(intersectionViewModel)
                 }
             }
         }
@@ -62,38 +64,38 @@ fun LightView(
 }
 
 @Composable
-fun TrafficLightView(modifier: Modifier, model: TrafficLightModel) {
+fun TrafficLightView(modifier: Modifier, viewModel: TrafficLightViewModel) {
     Column(
         modifier.drawBehind { drawRect(Color.DarkGray) },
         verticalArrangement = Arrangement.SpaceAround,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val lightModifier = Modifier
-            .fillMaxWidth()
+        val lightModifier = Modifier.fillMaxHeight(1f)
             .aspectRatio(1f)
             .weight(1f)
             .padding(8.dp)
         Text(
-            text = model.name,
-            modifier = Modifier.padding(16.dp),
+            text = viewModel.name,
+            modifier = lightModifier,
             color = Color.White,
-            fontSize = 16.sp,
+            fontSize = 24.sp,
+            textAlign = TextAlign.Center,
             fontWeight = FontWeight.Bold
         )
         LightView(
             lightModifier,
             Color.Red,
-            model.red.observeAsState(false)
+            viewModel.red.observeAsState(false)
         )
         LightView(
             lightModifier,
             Amber,
-            model.amber.observeAsState(false)
+            viewModel.amber.observeAsState(false)
         )
         LightView(
             lightModifier,
             Color.Green,
-            model.green.observeAsState(false)
+            viewModel.green.observeAsState(false)
         )
     }
 }
@@ -102,9 +104,9 @@ fun TrafficLightView(modifier: Modifier, model: TrafficLightModel) {
 fun StateButton(
     name: String,
     allow: Boolean,
-    model: TrafficIntersectionModel,
+    model: TrafficIntersectionViewModel,
     coroutineScope: CoroutineScope,
-    onChange: suspend TrafficIntersectionModel.() -> Unit
+    onChange: suspend TrafficIntersectionViewModel.() -> Unit
 ) {
     Button(
         onClick = {
@@ -124,7 +126,7 @@ fun StateButton(
 @Composable
 fun IntersectionControls(
     modifier: Modifier,
-    model: TrafficIntersectionModel,
+    model: TrafficIntersectionViewModel,
     coroutineScope: CoroutineScope
 ) {
     Row(
@@ -163,14 +165,14 @@ fun IntersectionControls(
 }
 
 @Composable
-fun IntersectionState(state: IntersectionStates, model: TrafficIntersectionModel) {
+fun IntersectionState(state: IntersectionStates, viewModel: TrafficIntersectionViewModel) {
     Row(
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = "State: ${state.name}, Active: ${model.currentName}",
+            text = "State: ${state.name}, Active: ${viewModel.currentName}",
             modifier = Modifier.padding(4.dp)
         )
     }
@@ -180,7 +182,7 @@ fun IntersectionState(state: IntersectionStates, model: TrafficIntersectionModel
             .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = "CT: ${model.cycleTime}, CWT: ${model.cycleWaitTime}, AT: ${model.amberTimeout}",
+            text = "CT: ${viewModel.cycleTime}, CWT: ${viewModel.cycleWaitTime}, AT: ${viewModel.amberTimeout}",
             modifier = Modifier.padding(4.dp),
             overflow = TextOverflow.Visible
         )
@@ -188,12 +190,12 @@ fun IntersectionState(state: IntersectionStates, model: TrafficIntersectionModel
 }
 
 @Composable
-fun Intersection(model: TrafficIntersectionModel) {
+fun Intersection(viewModel: TrafficIntersectionViewModel) {
     val coroutineScope = rememberCoroutineScope()
     val configuration = LocalConfiguration.current
     Column {
-        val state = model.intersectionState.observeAsState(IntersectionStates.STOPPED)
-        IntersectionState(state.value, model)
+        val state = viewModel.intersectionState.observeAsState(IntersectionStates.STOPPED)
+        IntersectionState(state.value, viewModel)
         when (configuration.orientation) {
             Configuration.ORIENTATION_PORTRAIT -> {
                 Column {
@@ -206,13 +208,13 @@ fun Intersection(model: TrafficIntersectionModel) {
                             .drawBehind { drawRect(Color.LightGray) },
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        model.listOrder.forEach {
+                        viewModel.trafficLightData.forEach {
+                            val trafficLightData = it.observeAsState(it.value!!)
                             TrafficLightView(
                                 Modifier
-                                    .fillMaxSize()
-                                    .weight(0.8f)
+                                    .weight(1f)
                                     .padding(16.dp),
-                                model.get(it)
+                                trafficLightData.value
                             )
                         }
                     }
@@ -221,7 +223,7 @@ fun Intersection(model: TrafficIntersectionModel) {
                             .fillMaxHeight()
                             .fillMaxWidth()
                             .weight(0.2f),
-                        model,
+                        viewModel,
                         coroutineScope
                     )
                 }
@@ -236,14 +238,14 @@ fun Intersection(model: TrafficIntersectionModel) {
                             .drawWithContent { drawRect(Color.LightGray) },
                         horizontalArrangement = Arrangement.SpaceEvenly,
                     ) {
-                        model.listOrder.forEach {
+                        viewModel.trafficLights.forEach {
                             TrafficLightView(
                                 Modifier
                                     .fillMaxWidth(0.3f)
                                     .fillMaxHeight()
                                     .weight(1f)
                                     .padding(16.dp),
-                                model.get(it)
+                                it
                             )
                         }
                     }
@@ -251,7 +253,7 @@ fun Intersection(model: TrafficIntersectionModel) {
                         Modifier
                             .fillMaxHeight()
                             .fillMaxWidth(0.5f),
-                        model,
+                        viewModel,
                         coroutineScope
                     )
                 }
