@@ -9,10 +9,13 @@ import kotlinx.coroutines.launch
 import mu.KotlinLogging
 
 class TrafficIntersectionModel(
-    val left: TrafficLightModel = TrafficLightModel("Left"),
-    val right: TrafficLightModel = TrafficLightModel("Right"),
     private val intersectionImpl: TrafficIntersectionImplementation =
-        TrafficIntersectionImplementation(left, right)
+        TrafficIntersectionImplementation(
+            listOf(
+                TrafficLightModel("1"),
+                TrafficLightModel("2")
+            )
+        )
 ) : ViewModel(), TrafficIntersection by intersectionImpl {
     companion object {
         private val logger = KotlinLogging.logger {}
@@ -31,19 +34,12 @@ class TrafficIntersectionModel(
     val allowStop: LiveData<Boolean> = _allowStop
     private var stateReceiver: (suspend (newState: IntersectionStates) -> Unit)? = null
 
-    val leftAmberTimeout: Long
-        get() = left.amberTimeout
-    val rightAmberTimeout: Long
-        get() = right.amberTimeout
+    val amberTimeout: Long
+        get() = current.amberTimeout
 
     init {
         GlobalScope.launch(Dispatchers.Main) {
             determineAllowed()
-        }
-        intersectionImpl.apply {
-            changeCycleWaitTime(1000L)
-            changeLeftCycleTime(5000L)
-            changeRightCycleTime(5000L)
         }
 
         // Glue to connect TrafficIntersectionFSM and TrafficLightFSM events and to ensure they execute in the correct coroutine context
@@ -73,23 +69,17 @@ class TrafficIntersectionModel(
         logger.info { "determineAllowed:switch:${_allowSwitch.value}" }
     }
 
-    fun changeLeftAmberTimeout(value: Long) {
-        logger.info { "changeLeftAmberTimeout:$value" }
-        left.changeAmberTimeout(value)
+    override fun get(name: String): TrafficLightModel {
+        return intersectionImpl.get(name) as TrafficLightModel
     }
 
-    fun changeRightAmberTimeout(value: Long) {
-        logger.info { "changeRightAmberTimeout:$value" }
-        right.changeAmberTimeout(value)
-    }
-
-    suspend fun start() {
-        logger.info("start")
+    suspend fun startSystem() {
+        logger.info("startSystem")
         intersectionFSM.start()
     }
 
-    suspend fun stop() {
-        logger.info("stop")
+    suspend fun stopSystem() {
+        logger.info("stopSystem")
         intersectionFSM.stop()
     }
 

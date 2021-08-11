@@ -14,6 +14,7 @@ enum class TrafficLightEvents {
 }
 
 interface TrafficLight {
+    val name: String
     val amberTimeout: Long
     fun setNotifyStopped(receiver: suspend () -> Unit)
     fun setNotifyStateChange(receiver: suspend (newState: TrafficLightStates) -> Unit)
@@ -26,7 +27,7 @@ interface TrafficLight {
 
 class TrafficLightFSM(context: TrafficLight) {
     companion object {
-        val definition = asyncStateMachine(
+        private val definition = asyncStateMachine(
             TrafficLightStates.values().toSet(),
             TrafficLightEvents.values().toSet(), TrafficLight::class
         ) {

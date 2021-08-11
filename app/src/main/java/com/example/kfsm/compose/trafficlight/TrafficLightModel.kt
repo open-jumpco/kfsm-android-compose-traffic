@@ -7,11 +7,12 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import mu.KotlinLogging
 
-class TrafficLightModel(private val name: String) : ViewModel(), TrafficLight {
+class TrafficLightModel(lightName: String) : ViewModel(), TrafficLight {
     companion object {
         private val logger = KotlinLogging.logger {}
     }
 
+    override val name: String = lightName
     private var amberTimeoutValue: Long = 2000L
     override val amberTimeout: Long
         get() = amberTimeoutValue
