@@ -76,14 +76,17 @@ class TrafficIntersectionViewModel constructor(
     }
 
     suspend fun startSystem() {
+        logger.info { "startSystem" }
         trafficIntersectionModel.startSystem()
     }
 
     suspend fun stopSystem() {
+        logger.info { "stopSystem" }
         trafficIntersectionModel.stopSystem()
     }
 
     suspend fun switch() {
+        logger.info { "switch" }
         trafficIntersectionModel.switch()
     }
 
