@@ -5,10 +5,14 @@ skinparam state {
     BackgroundColor LightBlue
 }
 state TrafficLightFSM {
-RED --> GREEN : GO\l<<action>> {\lswitchRed(false)\lswitchGreen(true)\l}
-RED --> RED : STOP\l<<action>> {\lswitchGreen(false)\lswitchAmber(false)\lswitchRed(true)\l}
-AMBER --> RED : <<timeout = {amberTimeout}>>\l<<action>> {\lswitchAmber(false)\lswitchRed(true)\lstopped()\l}
-AMBER --> AMBER : STOP\l<<action>> {\l}
-GREEN --> AMBER : STOP\l<<action>> {\lswitchGreen(false)\lswitchAmber(true)\l}
+OFF --> GREEN : GO\l<<action>> {\llogger.info{"OFF:GO:$name"}\lswitchRed(false)\lswitchGreen(true)\l}
+RED --> GREEN : GO\l<<action>> {\llogger.info{"RED:GO:$name"}\lswitchRed(false)\lswitchGreen(true)\l}
+RED --> RED : STOP\l<<action>> {\llogger.info{"RED:STOP:$name"}\lswitchGreen(false)\lswitchAmber(false)\lswitchRed(true)\l}
+RED --> OFF : OFF\l<<action>> {\llogger.info{"RED:OFF:$name"}\lswitchGreen(false)\lswitchAmber(false)\lswitchRed(true)\l}
+AMBER --> RED : <<timeout = {amberTimeout}>>\l<<action>> {\llogger.info{"AMBER:timeout:$name"}\lswitchRed(true)\lswitchAmber(false)\lstopped()\l}
+AMBER --> AMBER : STOP\l<<action>> {\llogger.info{"AMBER:STOP:$name"}\l}
+AMBER --> OFF : OFF\l<<action>> {\llogger.info{"AMBER:OFF:$name"}\lswitchGreen(false)\lswitchAmber(false)\lswitchRed(true)\l}
+GREEN --> AMBER : STOP\l<<action>> {\llogger.info{"GGREEN:STOP:$name"}\lswitchGreen(false)\lswitchAmber(true)\l}
+GREEN --> OFF : OFF\l<<action>> {\llogger.info{"GREEN:OFF:$name"}\lswitchGreen(false)\lswitchAmber(false)\lswitchRed(true)\l}
 }
 @enduml

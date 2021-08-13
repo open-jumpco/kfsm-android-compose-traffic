@@ -11,6 +11,7 @@
 a| [source,kotlin]
 ----
 {
+logger.info{"STOPPED:START"}
 start()
 }
 ----
@@ -21,6 +22,7 @@ start()
 a| [source,kotlin]
 ----
 {
+logger.info{"STOPPED:STOPPED"}
 }
 ----
 
@@ -30,6 +32,7 @@ a| [source,kotlin]
 a| [source,kotlin]
 ----
 {
+logger.info{"GOING:timeout"}
 stop()
 }
 ----
@@ -40,16 +43,18 @@ stop()
 a| [source,kotlin]
 ----
 {
+logger.info{"GOING:SWITCH"}
 stop()
 }
 ----
 
 | GOING
 | STOP
-| STOPPED
+| WAITING_STOPPED
 a| [source,kotlin]
 ----
 {
+logger.info{"GOING:STOP"}
 stop()
 }
 ----
@@ -60,25 +65,27 @@ stop()
 a| [source,kotlin]
 ----
 {
+logger.info{"STOPPED"}
 }
 ----
 
 | STOPPING
 | SWITCH
-| WAITING
+| STOPPING
 a| [source,kotlin]
 ----
 {
+logger.info{"SWITCH"}
 }
 ----
 
 | STOPPING
 | STOP
-| STOPPED
+| WAITING_STOPPED
 a| [source,kotlin]
 ----
 {
-stop()
+logger.info{"STOP"}
 }
 ----
 
@@ -88,6 +95,7 @@ stop()
 a| [source,kotlin]
 ----
 {
+logger.info{"WAITING:timeout"}
 next()
 start()
 }
@@ -99,16 +107,28 @@ start()
 a| [source,kotlin]
 ----
 {
+logger.info{"WAITING:SWITCH"}
 }
 ----
 
 | WAITING
 | STOP
+| WAITING_STOPPED
+a| [source,kotlin]
+----
+{
+logger.info{"WAITING:STOP"}
+}
+----
+
+| WAITING_STOPPED
+| \<<timeout = {cycleWaitTime/2}>>
 | STOPPED
 a| [source,kotlin]
 ----
 {
-stop()
+logger.info{"WAITING_STOPPED:timeout"}
+off()
 }
 ----
 |===

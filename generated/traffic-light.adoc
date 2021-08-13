@@ -5,12 +5,25 @@
 |===
 | Start | Event[Guard] | Target | Action
 
+| OFF
+| GO
+| GREEN
+a| [source,kotlin]
+----
+{
+logger.info{"OFF:GO:$name"}
+switchRed(false)
+switchGreen(true)
+}
+----
+
 | RED
 | GO
 | GREEN
 a| [source,kotlin]
 ----
 {
+logger.info{"RED:GO:$name"}
 switchRed(false)
 switchGreen(true)
 }
@@ -22,6 +35,20 @@ switchGreen(true)
 a| [source,kotlin]
 ----
 {
+logger.info{"RED:STOP:$name"}
+switchGreen(false)
+switchAmber(false)
+switchRed(true)
+}
+----
+
+| RED
+| OFF
+| OFF
+a| [source,kotlin]
+----
+{
+logger.info{"RED:OFF:$name"}
 switchGreen(false)
 switchAmber(false)
 switchRed(true)
@@ -34,8 +61,9 @@ switchRed(true)
 a| [source,kotlin]
 ----
 {
-switchAmber(false)
+logger.info{"AMBER:timeout:$name"}
 switchRed(true)
+switchAmber(false)
 stopped()
 }
 ----
@@ -46,6 +74,20 @@ stopped()
 a| [source,kotlin]
 ----
 {
+logger.info{"AMBER:STOP:$name"}
+}
+----
+
+| AMBER
+| OFF
+| OFF
+a| [source,kotlin]
+----
+{
+logger.info{"AMBER:OFF:$name"}
+switchGreen(false)
+switchAmber(false)
+switchRed(true)
 }
 ----
 
@@ -55,8 +97,22 @@ a| [source,kotlin]
 a| [source,kotlin]
 ----
 {
+logger.info{"GGREEN:STOP:$name"}
 switchGreen(false)
 switchAmber(true)
+}
+----
+
+| GREEN
+| OFF
+| OFF
+a| [source,kotlin]
+----
+{
+logger.info{"GREEN:OFF:$name"}
+switchGreen(false)
+switchAmber(false)
+switchRed(true)
 }
 ----
 |===

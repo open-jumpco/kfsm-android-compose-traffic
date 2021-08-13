@@ -13,9 +13,11 @@ The application illustrates how to create a view models that uses `LiveData` to 
 == Demo
 
 === Two Traffic Lights
+
 image:demo2.gif[Two Traffic Lights]
 
 === Three Traffic Lights
+
 image:demo3.gif[Three Traffic Lights]
 
 === Downloads
@@ -29,11 +31,23 @@ image:traffic-intersection-model.svg[Static]
 
 == Generated Traffic Light Models
 
+=== Simple State Diagram
+
+image:traffic-light-simple.svg[Static]
+
+=== Detailed State Diagram
+
 image:traffic-light.svg[Static]
 
 include::generated/traffic-light.adoc[]
 
 == Generated Intersection Models
+
+=== Simple State Diagram
+
+image:traffic-intersection-simple.svg[Static]
+
+=== Detailed State Diagram
 
 image:traffic-intersection.svg[Static]
 

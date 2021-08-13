@@ -5,16 +5,17 @@ skinparam state {
     BackgroundColor LightBlue
 }
 state TrafficIntersectionFSM {
-STOPPED --> GOING : START\l<<action>> {\lstart()\l}
-STOPPED --> STOPPED : STOPPED\l<<action>> {\l}
-GOING --> STOPPING : <<timeout = {cycleTime}>>\l<<action>> {\lstop()\l}
-GOING --> STOPPING : SWITCH\l<<action>> {\lstop()\l}
-GOING --> STOPPED : STOP\l<<action>> {\lstop()\l}
-STOPPING --> WAITING : STOPPED\l<<action>> {\l}
-STOPPING --> WAITING : SWITCH\l<<action>> {\l}
-STOPPING --> STOPPED : STOP\l<<action>> {\lstop()\l}
-WAITING --> GOING : <<timeout = {cycleWaitTime}>>\l<<action>> {\lnext()\lstart()\l}
-WAITING --> WAITING : SWITCH\l<<action>> {\l}
-WAITING --> STOPPED : STOP\l<<action>> {\lstop()\l}
+STOPPED --> GOING : START\l<<action>> {\llogger.info{"STOPPED:START"}\lstart()\l}
+STOPPED --> STOPPED : STOPPED\l<<action>> {\llogger.info{"STOPPED:STOPPED"}\l}
+GOING --> STOPPING : <<timeout = {cycleTime}>>\l<<action>> {\llogger.info{"GOING:timeout"}\lstop()\l}
+GOING --> STOPPING : SWITCH\l<<action>> {\llogger.info{"GOING:SWITCH"}\lstop()\l}
+GOING --> WAITING_STOPPED : STOP\l<<action>> {\llogger.info{"GOING:STOP"}\lstop()\l}
+STOPPING --> WAITING : STOPPED\l<<action>> {\llogger.info{"STOPPED"}\l}
+STOPPING --> STOPPING : SWITCH\l<<action>> {\llogger.info{"SWITCH"}\l}
+STOPPING --> WAITING_STOPPED : STOP\l<<action>> {\llogger.info{"STOP"}\l}
+WAITING --> GOING : <<timeout = {cycleWaitTime}>>\l<<action>> {\llogger.info{"WAITING:timeout"}\lnext()\lstart()\l}
+WAITING --> WAITING : SWITCH\l<<action>> {\llogger.info{"WAITING:SWITCH"}\l}
+WAITING --> WAITING_STOPPED : STOP\l<<action>> {\llogger.info{"WAITING:STOP"}\l}
+WAITING_STOPPED --> STOPPED : <<timeout = {cycleWaitTime/2}>>\l<<action>> {\llogger.info{"WAITING_STOPPED:timeout"}\loff()\l}
 }
 @enduml
