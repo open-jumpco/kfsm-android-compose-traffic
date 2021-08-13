@@ -1,8 +1,11 @@
 package com.example.kfsm.compose.trafficlight
 
 import android.content.res.Configuration
+import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.ButtonElevation
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
@@ -42,7 +45,8 @@ fun StateButton(
             }
         },
         enabled = allow,
-        contentPadding = PaddingValues(4.dp)
+        contentPadding = PaddingValues(4.dp),
+        elevation = ButtonDefaults.elevation()
     ) {
         Text(name)
     }

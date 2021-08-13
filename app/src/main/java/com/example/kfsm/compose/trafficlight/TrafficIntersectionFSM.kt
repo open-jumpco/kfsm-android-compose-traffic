@@ -8,6 +8,7 @@ enum class IntersectionStates {
     WAITING,
     GOING,
     NEXT,
+    WAITING_STOPPED,
     STOPPED
 }
 
@@ -34,6 +35,7 @@ interface TrafficIntersection {
     suspend fun start()
     suspend fun stop()
     suspend fun next()
+    suspend fun off()
 }
 
 class TrafficIntersectionFSM(context: TrafficIntersection) {
@@ -49,30 +51,46 @@ class TrafficIntersectionFSM(context: TrafficIntersection) {
                 stateChanged(toState)
             }
             whenState(IntersectionStates.STOPPED) {
+                onEntry { _, _, _ ->
+                    logger.info("STOPPED")
+                }
                 onEvent(IntersectionEvents.START to IntersectionStates.GOING) {
+                    logger.info { "STOPPED:START" }
                     start()
                 }
                 onEvent(IntersectionEvents.STOPPED) {
+                    logger.info { "STOPPED:STOPPED" }
                 }
             }
             whenState(IntersectionStates.GOING) {
+                onEntry { _, _, _ ->
+                    logger.info("GOING:$cycleTime")
+                }
                 timeout(IntersectionStates.STOPPING, { cycleTime }) {
+                    logger.info { "GOING:timeout" }
                     stop()
                 }
                 onEvent(IntersectionEvents.SWITCH to IntersectionStates.STOPPING) {
+                    logger.info { "GOING:SWITCH" }
                     stop()
                 }
-                onEvent(IntersectionEvents.STOP to IntersectionStates.STOPPED) {
+                onEvent(IntersectionEvents.STOP to IntersectionStates.WAITING_STOPPED) {
+                    logger.info { "GOING:STOP" }
                     stop()
                 }
             }
             whenState(IntersectionStates.STOPPING) {
+                onEntry { _, _, _ ->
+                    logger.info("STOPPING")
+                }
                 onEvent(IntersectionEvents.STOPPED to IntersectionStates.WAITING) {
+                    logger.info { "STOPPED" }
                 }
-                onEvent(IntersectionEvents.SWITCH to IntersectionStates.WAITING) {
+                onEvent(IntersectionEvents.SWITCH) {
+                    logger.info { "SWITCH" }
                 }
-                onEvent(IntersectionEvents.STOP to IntersectionStates.STOPPED) {
-                    stop()
+                onEvent(IntersectionEvents.STOP to IntersectionStates.WAITING_STOPPED) {
+                    logger.info { "STOP" }
                 }
             }
             whenState(IntersectionStates.WAITING) {
@@ -80,13 +98,24 @@ class TrafficIntersectionFSM(context: TrafficIntersection) {
                     logger.info("WAITING:$cycleWaitTime")
                 }
                 timeout(IntersectionStates.GOING, { cycleWaitTime }) {
+                    logger.info { "WAITING:timeout" }
                     next()
                     start()
                 }
                 onEvent(IntersectionEvents.SWITCH) {
+                    logger.info { "WAITING:SWITCH" }
                 }
-                onEvent(IntersectionEvents.STOP to IntersectionStates.STOPPED) {
-                    stop()
+                onEvent(IntersectionEvents.STOP to IntersectionStates.WAITING_STOPPED) {
+                    logger.info { "WAITING:STOP" }
+                }
+            }
+            whenState(IntersectionStates.WAITING_STOPPED) {
+                onEntry { _, _, _ ->
+                    logger.info("WAITING_STOPPED:${cycleWaitTime / 2}")
+                }
+                timeout(IntersectionStates.STOPPED, { cycleWaitTime / 2 }) {
+                    logger.info { "WAITING_STOPPED:timeout" }
+                    off()
                 }
             }
         }.build()

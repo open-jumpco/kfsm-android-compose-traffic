@@ -97,21 +97,32 @@ open class TrafficIntersectionImplementation(
     override suspend fun start() {
         val fsm = stateMachines[currentName]
         requireNotNull(fsm) { "expected stateMachine for $currentName" }
+        logger.info { "$currentState:$currentName:start()" }
         fsm.start()
     }
 
     override suspend fun stop() {
         val fsm = stateMachines[currentName]
         requireNotNull(fsm) { "expected stateMachine for $currentName" }
+        logger.info { "$currentState:$currentName:stop()" }
         fsm.stop()
     }
 
+    override suspend fun off() {
+        val fsm = stateMachines[currentName]
+        requireNotNull(fsm) { "expected stateMachine for $currentName" }
+        logger.info { "$currentState:$currentName:off()" }
+        fsm.off()
+    }
+
     override suspend fun next() {
+        val oldName = currentName
         var index = order.indexOf(currentName) + 1
         if (index >= order.size) {
             index = 0
         }
         _currentName = order[index]
+        logger.info { "$currentState:$oldName -> $currentName" }
     }
 
     suspend fun startSystem() {
