@@ -3,7 +3,7 @@ package com.example.kfsm.compose.trafficlight
 import mu.KotlinLogging
 
 open class TrafficIntersectionImplementation(
-    lights: List<TrafficLight>
+    lights: List<TrafficLight>,
 ) : TrafficIntersection {
     companion object {
         private val logger = KotlinLogging.logger {}
@@ -12,17 +12,18 @@ open class TrafficIntersectionImplementation(
     private val trafficLights = mutableMapOf<String, TrafficLight>()
     private val stateMachines = mutableMapOf<String, TrafficLightFSM>()
     private val order = mutableListOf<String>()
-    var _currentName: String
-    var _current: TrafficLight
-    var stoppedReceiver: (suspend () -> Unit)? = null
-    var _cycleWaitTime: Long = 1000L
-    var _cycleTime: Long = 5000L
-    var stateNotifier: (suspend (newState: IntersectionStates) -> Unit)? = null
-    var _amberTimeout: Long = 2000L
+    private val intersectionFSM = TrafficIntersectionFSM(this)
+    private var _currentName: String
+    private var _current: TrafficLight
+    private var stoppedReceiver: (suspend () -> Unit)? = null
+    private var _cycleWaitTime: Long = 1000L
+    private var _cycleTime: Long = 5000L
+    private var stateNotifier: (suspend (newState: IntersectionStates) -> Unit)? = null
+    private var _amberTimeout: Long = 2000L
 
     init {
         require(lights.isNotEmpty()) { "At least one light is required" }
-        _current = (lights[0] ?: error("expected lights not empty"))
+        _current = lights[0]
         _currentName = _current.name
 
         lights.forEach {
@@ -46,7 +47,7 @@ open class TrafficIntersectionImplementation(
         get() = order
 
     override fun get(name: String): TrafficLight {
-        return trafficLights.get(name) ?: error("expected trafficLight:$name")
+        return trafficLights[name] ?: error("expected trafficLight:$name")
     }
 
     override val cycleTime: Long
@@ -60,7 +61,6 @@ open class TrafficIntersectionImplementation(
 
     override val cycleWaitTime: Long
         get() = _cycleWaitTime
-    private val intersectionFSM = TrafficIntersectionFSM(this)
     val currentState: IntersectionStates
         get() = intersectionFSM.currentState
 

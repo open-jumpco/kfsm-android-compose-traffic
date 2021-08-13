@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -43,7 +42,12 @@ class MainActivity : AppCompatActivity() {
 fun DefaultPreview() {
 
     KFSMComposeTrafficLightTheme {
-        Text(text = "Traffic Light")
+        Scaffold {
+            portraitMode.value = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
+            Surface(color = MaterialTheme.colors.background) {
+                Intersection(intersectionViewModel, portraitMode.value)
+            }
+        }
     }
 }
 
