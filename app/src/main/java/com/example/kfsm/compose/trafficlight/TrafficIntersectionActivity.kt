@@ -1,11 +1,8 @@
 package com.example.kfsm.compose.trafficlight
 
-import android.content.res.Configuration
-import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.ButtonElevation
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
@@ -13,7 +10,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.SpanStyle
@@ -128,74 +124,82 @@ fun IntersectionState(state: IntersectionStates, viewModel: TrafficIntersectionV
 }
 
 @Composable
-fun Intersection(viewModel: TrafficIntersectionViewModel) {
+fun Intersection(viewModel: TrafficIntersectionViewModel, portraitMode: Boolean) {
     val coroutineScope = rememberCoroutineScope()
     val configuration = LocalConfiguration.current
     Column {
         val state = viewModel.intersectionState.observeAsState(IntersectionStates.STOPPED)
-        IntersectionState(state.value, viewModel)
-        when (configuration.orientation) {
-            Configuration.ORIENTATION_PORTRAIT -> {
-                Column {
-                    Row(
-                        Modifier
-                            .fillMaxHeight()
-                            .fillMaxWidth()
-                            .weight(0.8f)
-                            .padding(16.dp)
-                            .drawBehind { drawRect(Color.LightGray) },
-                        horizontalArrangement = Arrangement.SpaceEvenly,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        viewModel.trafficLightData.forEach {
-                            val trafficLightData = it.observeAsState(it.value!!)
-                            TrafficLightView(
-                                Modifier
-                                    .aspectRatio(0.4f, true)
-                                    .weight(1f)
-                                    .padding(16.dp),
-                                trafficLightData.value
-                            )
-                        }
+        if (portraitMode) {
+            Column {
+                IntersectionState(state.value, viewModel)
+                Row(
+                    Modifier
+                        .fillMaxHeight()
+                        .fillMaxWidth()
+                        .weight(0.8f)
+                        .padding(16.dp)
+                        .drawBehind { drawRect(Color.LightGray) },
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    viewModel.trafficLightData.forEach {
+                        val trafficLightData = it.observeAsState(it.value!!)
+                        TrafficLightView(
+                            Modifier
+                                .aspectRatio(0.4f, true)
+                                .weight(1f)
+                                .padding(16.dp),
+                            trafficLightData.value
+                        )
                     }
+                }
+                IntersectionControls(
+                    Modifier
+                        .fillMaxHeight()
+                        .fillMaxWidth()
+                        .weight(0.2f),
+                    viewModel,
+                    coroutineScope
+                )
+            }
+        } else {
+            Row {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth(0.5f)
+                        .fillMaxHeight(),
+                    horizontalAlignment = Alignment.Start,
+                    verticalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    IntersectionState(state.value, viewModel)
                     IntersectionControls(
                         Modifier
-                            .fillMaxHeight()
+                            .padding(16.dp)
                             .fillMaxWidth()
-                            .weight(0.2f),
+                            .weight(1f),
                         viewModel,
                         coroutineScope
                     )
                 }
-            }
-            else -> {
-                Row {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(0.5f)
-                            .fillMaxHeight()
-                            .padding(16.dp)
-                            .drawWithContent { drawRect(Color.LightGray) },
-                        horizontalArrangement = Arrangement.SpaceEvenly,
-                    ) {
-                        viewModel.trafficLights.forEach {
-                            TrafficLightView(
-                                Modifier
-                                    .fillMaxWidth(0.3f)
-                                    .fillMaxHeight()
-                                    .weight(1f)
-                                    .padding(16.dp),
-                                it
-                            )
-                        }
+                Row(
+                    Modifier
+                        .fillMaxHeight()
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .drawBehind { drawRect(Color.LightGray) },
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    viewModel.trafficLights.forEach {
+                        TrafficLightView(
+                            Modifier
+                                .fillMaxWidth(0.3f)
+                                .fillMaxHeight()
+                                .weight(1f)
+                                .padding(16.dp),
+                            it
+                        )
                     }
-                    IntersectionControls(
-                        Modifier
-                            .fillMaxHeight()
-                            .fillMaxWidth(0.5f),
-                        viewModel,
-                        coroutineScope
-                    )
                 }
             }
         }
