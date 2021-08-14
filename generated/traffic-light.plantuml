@@ -1,18 +1,21 @@
 @startuml
+skinparam monochrome true
 skinparam StateFontName Helvetica
 skinparam defaultFontName Monospaced
+skinparam defaultFontStyle Bold
 skinparam state {
-    BackgroundColor LightBlue
+    FontColor Black
+    FontStyle Bold
 }
 state TrafficLightFSM {
-OFF --> GREEN : GO\l<<action>> {\llogger.info{"OFF:GO:$name"}\lswitchRed(false)\lswitchGreen(true)\l}
-RED --> GREEN : GO\l<<action>> {\llogger.info{"RED:GO:$name"}\lswitchRed(false)\lswitchGreen(true)\l}
-RED --> RED : STOP\l<<action>> {\llogger.info{"RED:STOP:$name"}\lswitchGreen(false)\lswitchAmber(false)\lswitchRed(true)\l}
-RED --> OFF : OFF\l<<action>> {\llogger.info{"RED:OFF:$name"}\lswitchGreen(false)\lswitchAmber(false)\lswitchRed(true)\l}
-AMBER --> RED : <<timeout = {amberTimeout}>>\l<<action>> {\llogger.info{"AMBER:timeout:$name"}\lswitchRed(true)\lswitchAmber(false)\lstopped()\l}
-AMBER --> AMBER : STOP\l<<action>> {\llogger.info{"AMBER:STOP:$name"}\l}
-AMBER --> OFF : OFF\l<<action>> {\llogger.info{"AMBER:OFF:$name"}\lswitchGreen(false)\lswitchAmber(false)\lswitchRed(true)\l}
-GREEN --> AMBER : STOP\l<<action>> {\llogger.info{"GGREEN:STOP:$name"}\lswitchGreen(false)\lswitchAmber(true)\l}
-GREEN --> OFF : OFF\l<<action>> {\llogger.info{"GREEN:OFF:$name"}\lswitchGreen(false)\lswitchAmber(false)\lswitchRed(true)\l}
+OFF --> GREEN : GO -> {\l  logger.info{"OFF:GO:$name"}\l  switchRed(false)\l  switchGreen(true)\l}
+RED --> GREEN : GO -> {\l  logger.info{"RED:GO:$name"}\l  switchRed(false)\l  switchGreen(true)\l}
+RED --> RED : STOP -> {\l  logger.info{"RED:STOP:$name"}\l  switchGreen(false)\l  switchAmber(false)\l  switchRed(true)\l}
+RED --> OFF : OFF -> {\l  logger.info{"RED:OFF:$name"}\l  switchGreen(false)\l  switchAmber(false)\l  switchRed(true)\l}
+AMBER --> RED : <<timeout = {amberTimeout}>> -> {\l  logger.info{"AMBER:timeout:$name"}\l  switchRed(true)\l  switchAmber(false)\l  stopped()\l}
+AMBER --> AMBER : STOP -> {\l  logger.info{"AMBER:STOP:$name"}\l}
+AMBER --> OFF : OFF -> {\l  logger.info{"AMBER:OFF:$name"}\l  switchGreen(false)\l  switchAmber(false)\l  switchRed(true)\l}
+GREEN --> AMBER : STOP -> {\l  logger.info{"GGREEN:STOP:$name"}\l  switchGreen(false)\l  switchAmber(true)\l}
+GREEN --> OFF : OFF -> {\l  logger.info{"GREEN:OFF:$name"}\l  switchGreen(false)\l  switchAmber(false)\l  switchRed(true)\l}
 }
 @enduml
