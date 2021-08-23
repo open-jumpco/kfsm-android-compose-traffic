@@ -1,11 +1,11 @@
-package com.example.kfsm.compose.trafficlight
+package com.example.kfsm.compose.traffic
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import com.example.kfsm.compose.traffic.fsm.IntersectionStates
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -59,7 +60,7 @@ fun IntersectionControls(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        val allowStart = model.allowStart.observeAsState(false)
+        val allowStart = model.allowStart.collectAsState(false)
         StateButton(
             "Start",
             allowStart.value,
@@ -68,7 +69,7 @@ fun IntersectionControls(
         ) {
             startSystem()
         }
-        val allowStop = model.allowStop.observeAsState(false)
+        val allowStop = model.allowStop.collectAsState(false)
         StateButton(
             "Stop",
             allowStop.value,
@@ -77,7 +78,7 @@ fun IntersectionControls(
         ) {
             stopSystem()
         }
-        val allowSwitch = model.allowSwitch.observeAsState(false)
+        val allowSwitch = model.allowSwitch.collectAsState(false)
         StateButton(
             "Switch",
             allowSwitch.value,
@@ -128,7 +129,7 @@ fun Intersection(viewModel: TrafficIntersectionViewModel, portraitMode: Boolean)
     val coroutineScope = rememberCoroutineScope()
     val configuration = LocalConfiguration.current
     Column {
-        val state = viewModel.intersectionState.observeAsState(IntersectionStates.STOPPED)
+        val state = viewModel.intersectionState.collectAsState(IntersectionStates.STOPPED)
         if (portraitMode) {
             Column {
                 IntersectionState(state.value, viewModel)
@@ -142,14 +143,14 @@ fun Intersection(viewModel: TrafficIntersectionViewModel, portraitMode: Boolean)
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    viewModel.trafficLightData.forEach {
-                        val trafficLightData = it.observeAsState(it.value!!)
+                    viewModel.trafficLights.forEach {
+                        val trafficLightData = it
                         TrafficLightView(
                             Modifier
                                 .aspectRatio(0.4f, true)
                                 .weight(1f)
                                 .padding(16.dp),
-                            trafficLightData.value
+                            trafficLightData
                         )
                     }
                 }

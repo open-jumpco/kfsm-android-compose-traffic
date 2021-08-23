@@ -20,5 +20,6 @@ WAITING --> GOING : <<timeout = {cycleWaitTime}>>
 WAITING --> WAITING : SWITCH
 WAITING --> WAITING_STOPPED : STOP
 WAITING_STOPPED --> STOPPED : <<timeout = {cycleWaitTime/2}>>
+WAITING_STOPPED --> WAITING_STOPPED : STOPPED
 }
 @enduml

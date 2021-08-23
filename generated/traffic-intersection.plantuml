@@ -20,5 +20,6 @@ WAITING --> GOING : <<timeout = {cycleWaitTime}>> -> {\l  logger.info{"WAITING:t
 WAITING --> WAITING : SWITCH -> {\l  logger.info{"WAITING:SWITCH"}\l}
 WAITING --> WAITING_STOPPED : STOP -> {\l  logger.info{"WAITING:STOP"}\l}
 WAITING_STOPPED --> STOPPED : <<timeout = {cycleWaitTime/2}>> -> {\l  logger.info{"WAITING_STOPPED:timeout"}\l  off()\l}
+WAITING_STOPPED --> WAITING_STOPPED : STOPPED -> {\l  logger.info{"WAITING_STOPPED:STOPPED:ignore"}\l}
 }
 @enduml

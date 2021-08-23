@@ -1,4 +1,4 @@
-package com.example.kfsm.compose.trafficlight
+package com.example.kfsm.compose.traffic
 
 import android.app.Application
 

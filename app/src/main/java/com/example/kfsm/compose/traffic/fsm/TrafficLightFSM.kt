@@ -1,43 +1,15 @@
-package com.example.kfsm.compose.trafficlight
+package com.example.kfsm.compose.traffic.fsm
 
 import io.jumpco.open.kfsm.async.asyncStateMachine
 import mu.KotlinLogging
 
-enum class TrafficLightStates {
-    RED,
-    AMBER,
-    GREEN,
-    OFF
-}
-
-enum class TrafficLightEvents {
-    STOP,
-    GO,
-    OFF
-}
-
-interface TrafficLight {
-    val name: String
-    val amberTimeout: Long
-    val amber: Boolean
-    val red: Boolean
-    val green: Boolean
-    fun setNotifyStopped(receiver: suspend () -> Unit)
-    fun setNotifyStateChange(receiver: suspend (newState: TrafficLightStates) -> Unit)
-    fun changeAmberTimeout(value: Long)
-    suspend fun stopped()
-    suspend fun switchRed(on: Boolean)
-    suspend fun switchAmber(on: Boolean)
-    suspend fun switchGreen(on: Boolean)
-    suspend fun stateChanged(toState: TrafficLightStates)
-}
-
-class TrafficLightFSM(context: TrafficLight) {
+class TrafficLightFSM(context: TrafficLightContext) {
     companion object {
         private val logger = KotlinLogging.logger {}
         private val definition = asyncStateMachine(
             TrafficLightStates.values().toSet(),
-            TrafficLightEvents.values().toSet(), TrafficLight::class
+            TrafficLightEvents.values().toSet(),
+            TrafficLightContext::class
         ) {
             initialState { TrafficLightStates.OFF }
             onStateChange { _, toState ->
@@ -51,6 +23,10 @@ class TrafficLightFSM(context: TrafficLight) {
                     logger.info { "OFF:GO:$name" }
                     switchRed(false)
                     switchGreen(true)
+                }
+                onEvent(TrafficLightEvents.STOP to TrafficLightStates.RED) {
+                    logger.info { "OFF:STOP:$name" }
+                    switchRed(true)
                 }
             }
             whenState(TrafficLightStates.RED) {
@@ -83,7 +59,7 @@ class TrafficLightFSM(context: TrafficLight) {
                     logger.info { "AMBER:timeout:$name" }
                     switchRed(true)
                     switchAmber(false)
-                    stopped()
+                    setStopped()
                 }
                 onEvent(TrafficLightEvents.STOP) {
                     logger.info { "AMBER:STOP:$name" }
@@ -100,7 +76,7 @@ class TrafficLightFSM(context: TrafficLight) {
                     logger.info { "GREEN:$name" }
                 }
                 onEvent(TrafficLightEvents.STOP to TrafficLightStates.AMBER) {
-                    logger.info { "GGREEN:STOP:$name" }
+                    logger.info { "GREEN:STOP:$name" }
                     switchGreen(false)
                     switchAmber(true)
                 }
@@ -128,3 +104,4 @@ class TrafficLightFSM(context: TrafficLight) {
         fsm.sendEvent(TrafficLightEvents.OFF)
     }
 }
+

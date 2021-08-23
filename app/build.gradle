@@ -9,7 +9,7 @@ android {
     compileSdk 30
 
     defaultConfig {
-        applicationId "com.example.kfsm.compose.trafficlight"
+        applicationId "com.example.kfsm.compose.traffic"
         minSdk 21
         targetSdk 30
         versionCode 1
@@ -79,14 +79,14 @@ dependencies {
 
 kfsmViz {
     fsm('TrafficLightFSM') {
-        input = file('src/main/java/com/example/kfsm/compose/trafficlight/TrafficLightFSM.kt')
+        input = file('src/main/java/com/example/kfsm/compose/traffic/fsm/TrafficLightFSM.kt')
         output = 'traffic-light'
         outputFolder = new File(rootProject.projectDir, 'generated')
         isGeneratePlantUml = true
         isGenerateAsciidoc = true
     }
     fsm('TrafficIntersectionFSM') {
-        input = file('src/main/java/com/example/kfsm/compose/trafficlight/TrafficIntersectionFSM.kt')
+        input = file('src/main/java/com/example/kfsm/compose/traffic/fsm/TrafficIntersectionFSM.kt')
         output = 'traffic-intersection'
         outputFolder = new File(rootProject.projectDir, 'generated')
         isGeneratePlantUml = true

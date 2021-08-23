@@ -1,4 +1,4 @@
-package com.example.kfsm.compose.trafficlight.ui.theme
+package com.example.kfsm.compose.traffic.theme
 
 import androidx.compose.material.Typography
 import androidx.compose.ui.text.TextStyle

@@ -1,50 +1,16 @@
-package com.example.kfsm.compose.trafficlight
+package com.example.kfsm.compose.traffic.fsm
 
 import io.jumpco.open.kfsm.async.asyncStateMachine
 import mu.KotlinLogging
 
-enum class IntersectionStates {
-    STOPPING,
-    WAITING,
-    GOING,
-    NEXT,
-    WAITING_STOPPED,
-    STOPPED
-}
 
-enum class IntersectionEvents {
-    SWITCH,
-    STOPPED,
-    STOP,
-    START
-}
-
-interface TrafficIntersection {
-    val cycleTime: Long
-    val cycleWaitTime: Long
-    fun setNotifyStateChange(receiver: suspend (newState: IntersectionStates) -> Unit)
-    fun setNotifyStopped(receiver: suspend () -> Unit)
-    fun addTrafficLight(name: String, trafficLight: TrafficLight)
-    val currentName: String
-    val current: TrafficLight
-    val listOrder: List<String>
-    fun get(name: String): TrafficLight
-    fun changeCycleTime(value: Long)
-    fun changeCycleWaitTime(value: Long)
-    suspend fun stateChanged(toState: IntersectionStates)
-    suspend fun start()
-    suspend fun stop()
-    suspend fun next()
-    suspend fun off()
-}
-
-class TrafficIntersectionFSM(context: TrafficIntersection) {
+class TrafficIntersectionFSM(context: TrafficIntersectionContext) {
     companion object {
         private val logger = KotlinLogging.logger {}
         private val definition = asyncStateMachine(
             IntersectionStates.values().toSet(),
             IntersectionEvents.values().toSet(),
-            TrafficIntersection::class
+            TrafficIntersectionContext::class
         ) {
             initialState { IntersectionStates.STOPPED }
             onStateChange { _, toState ->
@@ -117,6 +83,9 @@ class TrafficIntersectionFSM(context: TrafficIntersection) {
                     logger.info { "WAITING_STOPPED:timeout" }
                     off()
                 }
+                onEvent(IntersectionEvents.STOPPED) {
+                    logger.info { "WAITING_STOPPED:STOPPED:ignore" }
+                }
             }
         }.build()
     }
@@ -131,4 +100,5 @@ class TrafficIntersectionFSM(context: TrafficIntersection) {
     suspend fun stopped() = fsm.sendEvent(IntersectionEvents.STOPPED)
     fun allowedEvents() = fsm.allowed()
 }
+
 

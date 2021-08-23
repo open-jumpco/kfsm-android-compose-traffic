@@ -131,5 +131,15 @@ logger.info{"WAITING_STOPPED:timeout"}
 off()
 }
 ----
+
+| WAITING_STOPPED
+| STOPPED
+| WAITING_STOPPED
+a| [source,kotlin]
+----
+{
+logger.info{"WAITING_STOPPED:STOPPED:ignore"}
+}
+----
 |===
 

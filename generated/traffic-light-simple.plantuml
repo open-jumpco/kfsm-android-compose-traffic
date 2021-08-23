@@ -9,6 +9,7 @@ skinparam state {
 }
 state TrafficLightFSM {
 OFF --> GREEN : GO
+OFF --> RED : STOP
 RED --> GREEN : GO
 RED --> RED : STOP
 RED --> OFF : OFF

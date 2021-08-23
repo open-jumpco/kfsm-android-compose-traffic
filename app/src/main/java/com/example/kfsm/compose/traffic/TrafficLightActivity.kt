@@ -1,11 +1,11 @@
-package com.example.kfsm.compose.trafficlight
+package com.example.kfsm.compose.traffic
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -15,7 +15,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.kfsm.compose.trafficlight.ui.theme.Amber
+import com.example.kfsm.compose.traffic.fsm.TrafficLightEventHandler
+import com.example.kfsm.compose.traffic.theme.Amber
 
 @Composable
 fun LightView(
@@ -31,7 +32,7 @@ fun LightView(
 }
 
 @Composable
-fun TrafficLightView(modifier: Modifier, viewModel: TrafficLightViewModel) {
+fun TrafficLightView(modifier: Modifier, trafficLight: TrafficLightEventHandler) {
     Column(
         modifier.drawBehind { drawRect(Color.DarkGray) },
         verticalArrangement = Arrangement.SpaceEvenly,
@@ -42,7 +43,7 @@ fun TrafficLightView(modifier: Modifier, viewModel: TrafficLightViewModel) {
             .weight(1f)
             .padding(4.dp)
         Text(
-            text = viewModel.name,
+            text = trafficLight.name,
             modifier = lightModifier.wrapContentHeight(),
             color = Color.White,
             fontSize = 24.sp,
@@ -52,17 +53,17 @@ fun TrafficLightView(modifier: Modifier, viewModel: TrafficLightViewModel) {
         LightView(
             lightModifier,
             Color.Red,
-            viewModel.red.observeAsState(false)
+            trafficLight.red.collectAsState(false)
         )
         LightView(
             lightModifier,
             Amber,
-            viewModel.amber.observeAsState(false)
+            trafficLight.amber.collectAsState(false)
         )
         LightView(
             lightModifier,
             Color.Green,
-            viewModel.green.observeAsState(false)
+            trafficLight.green.collectAsState(false)
         )
     }
 }

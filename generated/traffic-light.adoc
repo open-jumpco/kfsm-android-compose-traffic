@@ -17,6 +17,17 @@ switchGreen(true)
 }
 ----
 
+| OFF
+| STOP
+| RED
+a| [source,kotlin]
+----
+{
+logger.info{"OFF:STOP:$name"}
+switchRed(true)
+}
+----
+
 | RED
 | GO
 | GREEN
@@ -64,7 +75,7 @@ a| [source,kotlin]
 logger.info{"AMBER:timeout:$name"}
 switchRed(true)
 switchAmber(false)
-stopped()
+setStopped()
 }
 ----
 
@@ -97,7 +108,7 @@ switchRed(true)
 a| [source,kotlin]
 ----
 {
-logger.info{"GGREEN:STOP:$name"}
+logger.info{"GREEN:STOP:$name"}
 switchGreen(false)
 switchAmber(true)
 }
