@@ -26,7 +26,7 @@ private val intersectionModel = TrafficIntersectionService(
     )
 )
 private var intersectionViewModel = TrafficIntersectionViewModel(intersectionModel)
-private var portraitMode: MutableState<Boolean> = mutableStateOf(false)
+private var portraitMode: MutableState<Boolean> = mutableStateOf(true)
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,9 +35,9 @@ class MainActivity : AppCompatActivity() {
             intersectionViewModel.setupIntersection()
         }
         setContent {
-            portraitMode.value =
-                LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
             MainWindow()
+            portraitMode.value =
+                Configuration.ORIENTATION_PORTRAIT == LocalConfiguration.current.orientation
         }
     }
 }

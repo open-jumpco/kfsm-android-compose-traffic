@@ -71,8 +71,9 @@ class TrafficIntersectionFSM(context: TrafficIntersectionContext) {
                 onEvent(IntersectionEvents.SWITCH) {
                     logger.info { "WAITING:SWITCH" }
                 }
-                onEvent(IntersectionEvents.STOP to IntersectionStates.WAITING_STOPPED) {
+                onEvent(IntersectionEvents.STOP to IntersectionStates.STOPPED) {
                     logger.info { "WAITING:STOP" }
+                    off()
                 }
             }
             whenState(IntersectionStates.WAITING_STOPPED) {
@@ -83,8 +84,9 @@ class TrafficIntersectionFSM(context: TrafficIntersectionContext) {
                     logger.info { "WAITING_STOPPED:timeout" }
                     off()
                 }
-                onEvent(IntersectionEvents.STOPPED) {
+                onEvent(IntersectionEvents.STOPPED to IntersectionStates.STOPPED) {
                     logger.info { "WAITING_STOPPED:STOPPED:ignore" }
+                    off()
                 }
             }
         }.build()

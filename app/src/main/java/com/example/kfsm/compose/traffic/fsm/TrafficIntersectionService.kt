@@ -2,9 +2,10 @@ package com.example.kfsm.compose.traffic.fsm
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.withContext
 import mu.KotlinLogging
 import java.util.concurrent.atomic.AtomicLong
 
@@ -15,6 +16,8 @@ class TrafficIntersectionService(
         private val logger = KotlinLogging.logger {}
     }
 
+    private val stateChannel = Channel<IntersectionStates>(2)
+    private val stoppedChannel = Channel<Long>(2)
     private val trafficLightData = mutableMapOf<String, TrafficLightEventHandler>()
     private val stateMachines = mutableMapOf<String, TrafficLightFSM>()
     private val order = mutableListOf<String>()
@@ -40,6 +43,8 @@ class TrafficIntersectionService(
             addTrafficLight(it.name, it)
             order.add(it.name)
         }
+        sendToChannel(stateChannel, _state, Dispatchers.Main)
+        sendToChannel(stoppedChannel, _stopped, Dispatchers.Main)
     }
 
     override fun changeAmberTimeout(value: Long) {
@@ -82,22 +87,12 @@ class TrafficIntersectionService(
         val fsm = stateMachines[name]
         requireNotNull(fsm) { "Expected to find TrafficLightFSM:$name" }
         fsm.stop()
-        CoroutineScope(Dispatchers.Default).async {
-            trafficLight.stopped.collect {
-                withContext(Dispatchers.Main) {
-                    _stopped.emit(_counter.incrementAndGet())
-                }
-            }
-        }
+        sharedFlowToChannel(trafficLight.stopped, stoppedChannel)
         logger.info { "startTrafficLight:$name:end" }
     }
 
     override suspend fun stateChanged(toState: IntersectionStates) {
-        CoroutineScope(Dispatchers.Default).async {
-            withContext(Dispatchers.Main) {
-                _state.emit(toState)
-            }
-        }
+        stateChannel.send(toState)
     }
 
     override fun changeCycleTime(value: Long) {
