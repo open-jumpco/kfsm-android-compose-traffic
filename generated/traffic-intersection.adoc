@@ -5,6 +5,11 @@
 |===
 | Start | Event[Guard] | Target | Action
 
+| <<start>>
+| 
+| STOPPED
+a| 
+
 | STOPPED
 | START
 | GOING
@@ -113,11 +118,12 @@ logger.info{"WAITING:SWITCH"}
 
 | WAITING
 | STOP
-| WAITING_STOPPED
+| STOPPED
 a| [source,kotlin]
 ----
 {
 logger.info{"WAITING:STOP"}
+off()
 }
 ----
 
@@ -134,11 +140,12 @@ off()
 
 | WAITING_STOPPED
 | STOPPED
-| WAITING_STOPPED
+| STOPPED
 a| [source,kotlin]
 ----
 {
 logger.info{"WAITING_STOPPED:STOPPED:ignore"}
+off()
 }
 ----
 |===

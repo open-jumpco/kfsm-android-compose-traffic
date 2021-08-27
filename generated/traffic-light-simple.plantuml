@@ -4,10 +4,10 @@ skinparam StateFontName Helvetica
 skinparam defaultFontName Monospaced
 skinparam defaultFontStyle Bold
 skinparam state {
-    FontColor Black
     FontStyle Bold
 }
 state TrafficLightFSM {
+[*] --> OFF
 OFF --> GREEN : GO
 OFF --> RED : STOP
 RED --> GREEN : GO

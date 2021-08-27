@@ -4,10 +4,10 @@ skinparam StateFontName Helvetica
 skinparam defaultFontName Monospaced
 skinparam defaultFontStyle Bold
 skinparam state {
-    FontColor Black
     FontStyle Bold
 }
 state TrafficLightFSM {
+[*] --> OFF
 OFF --> GREEN : GO -> {\l  logger.info{"OFF:GO:$name"}\l  switchRed(false)\l  switchGreen(true)\l}
 OFF --> RED : STOP -> {\l  logger.info{"OFF:STOP:$name"}\l  switchRed(true)\l}
 RED --> GREEN : GO -> {\l  logger.info{"RED:GO:$name"}\l  switchRed(false)\l  switchGreen(true)\l}
