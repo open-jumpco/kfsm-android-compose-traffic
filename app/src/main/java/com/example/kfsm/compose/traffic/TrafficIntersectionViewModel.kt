@@ -52,7 +52,7 @@ class TrafficIntersectionViewModel constructor(
 
     suspend fun setupIntersection() {
         trafficIntersection.setupIntersection()
-        CoroutineScope(Dispatchers.Default).async {
+        CoroutineScope(Dispatchers.Default).launch {
             trafficIntersection.stopped.collect {
                 viewModelScope.launch {
                     trafficIntersection.stopped()
