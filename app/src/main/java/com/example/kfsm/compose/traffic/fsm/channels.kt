@@ -11,14 +11,11 @@ import kotlinx.coroutines.flow.collect
 fun <T> sendToChannel(
     channel: ReceiveChannel<T>,
     flow: MutableStateFlow<T>,
-    dispatcher: CoroutineDispatcher = Dispatchers.Default
+    coroutineScope: CoroutineScope
 ) {
-    GlobalScope.launch {
-        while (true) {
-            val result = channel.receive()
-            CoroutineScope(dispatcher).launch {
-                flow.emit(result)
-            }
+    while (true) {
+        coroutineScope.async {
+            flow.emit(channel.receive())
         }
     }
 }
@@ -26,20 +23,21 @@ fun <T> sendToChannel(
 fun <T> sendToChannel(
     channel: ReceiveChannel<T>,
     flow: MutableSharedFlow<T>,
-    dispatcher: CoroutineDispatcher = Dispatchers.Default
+    coroutineScope: CoroutineScope
 ) {
-    GlobalScope.launch {
-        while (true) {
-            val result = channel.receive()
-            CoroutineScope(dispatcher).launch {
-                flow.emit(result)
-            }
+    while (true) {
+        coroutineScope.async {
+            flow.emit(channel.receive())
         }
     }
 }
 
-fun <T> sharedFlowToChannel(flow: SharedFlow<T>, channel: SendChannel<T>) {
-    GlobalScope.launch {
+fun <T> sharedFlowToChannel(
+    flow: SharedFlow<T>,
+    channel: SendChannel<T>,
+    coroutineScope: CoroutineScope
+) {
+    coroutineScope.async {
         flow.collect {
             channel.send(it)
         }

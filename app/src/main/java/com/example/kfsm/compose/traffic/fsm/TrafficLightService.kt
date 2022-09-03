@@ -9,7 +9,12 @@ import kotlinx.coroutines.flow.StateFlow
 import mu.KotlinLogging
 import java.util.concurrent.atomic.AtomicLong
 
-class TrafficLightService(lightName: String) : TrafficLightEventHandler {
+class TrafficLightService(
+    lightName: String,
+    uiCoroutineScope: CoroutineScope,
+    coroutineScope: CoroutineScope
+) :
+    TrafficLightEventHandler {
     companion object {
         private val logger = KotlinLogging.logger {}
     }
@@ -37,12 +42,13 @@ class TrafficLightService(lightName: String) : TrafficLightEventHandler {
 
 
     init {
-        sendToChannel(amberChannel, _amber, Dispatchers.Main)
-        sendToChannel(redChannel, _red, Dispatchers.Main)
-        sendToChannel(greenChannel, _green, Dispatchers.Main)
-        sendToChannel(stateChannel, _state, Dispatchers.Main)
-        sendToChannel(stoppedChannel, _stopped, Dispatchers.Main)
+        sendToChannel(amberChannel, _amber, uiCoroutineScope)
+        sendToChannel(redChannel, _red, uiCoroutineScope)
+        sendToChannel(greenChannel, _green, uiCoroutineScope)
+        sendToChannel(stateChannel, _state, uiCoroutineScope)
+        sendToChannel(stoppedChannel, _stopped, uiCoroutineScope)
     }
+
 
     override fun changeAmberTimeout(value: Long) {
         logger.info { "changeAmberTimeout:$name:$value" }

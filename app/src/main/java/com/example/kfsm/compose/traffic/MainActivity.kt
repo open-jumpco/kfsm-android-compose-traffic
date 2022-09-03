@@ -20,12 +20,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
+private val coroutineScope = CoroutineScope(Dispatchers.Default)
+private val uiCoroutineScope = CoroutineScope(Dispatchers.Main)
 private val intersectionModel = TrafficIntersectionService(
     listOf(
-        TrafficLightService("1"),
-        TrafficLightService("2"),
-        TrafficLightService("3")
-    )
+        TrafficLightService("1", uiCoroutineScope, coroutineScope),
+        TrafficLightService("2", uiCoroutineScope, coroutineScope),
+        TrafficLightService("3", uiCoroutineScope, coroutineScope)
+    ),
+    uiCoroutineScope,
+    coroutineScope
 )
 private var intersectionViewModel = TrafficIntersectionViewModel(intersectionModel)
 private var portraitMode: MutableStateFlow<Boolean> = MutableStateFlow(true)

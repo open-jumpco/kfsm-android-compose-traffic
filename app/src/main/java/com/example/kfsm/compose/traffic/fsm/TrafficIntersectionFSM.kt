@@ -1,10 +1,11 @@
 package com.example.kfsm.compose.traffic.fsm
 
 import io.jumpco.open.kfsm.async.asyncStateMachine
+import kotlinx.coroutines.CoroutineScope
 import mu.KotlinLogging
 
 
-class TrafficIntersectionFSM(context: TrafficIntersectionContext) {
+class TrafficIntersectionFSM(context: TrafficIntersectionContext, coroutineScope: CoroutineScope) {
     companion object {
         private val logger = KotlinLogging.logger {}
         private val definition = asyncStateMachine(
@@ -92,7 +93,7 @@ class TrafficIntersectionFSM(context: TrafficIntersectionContext) {
         }.build()
     }
 
-    private val fsm = definition.create(context)
+    private val fsm = definition.create(context, coroutineScope)
     val currentState: IntersectionStates
         get() = fsm.currentState
 

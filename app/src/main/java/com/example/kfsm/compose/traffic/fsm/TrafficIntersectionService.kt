@@ -2,15 +2,20 @@ package com.example.kfsm.compose.traffic.fsm
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import mu.KotlinLogging
 import java.util.concurrent.atomic.AtomicLong
 
 class TrafficIntersectionService(
-    override val trafficLights: List<TrafficLightEventHandler>
+    override val trafficLights: List<TrafficLightEventHandler>,
+    private val uiCoroutineScope: CoroutineScope,
+    private val coroutineScope: CoroutineScope
 ) : TrafficIntersectionEventHandler {
     companion object {
         private val logger = KotlinLogging.logger {}
@@ -21,7 +26,7 @@ class TrafficIntersectionService(
     private val trafficLightData = mutableMapOf<String, TrafficLightEventHandler>()
     private val stateMachines = mutableMapOf<String, TrafficLightFSM>()
     private val order = mutableListOf<String>()
-    private val intersectionFSM = TrafficIntersectionFSM(this)
+    private val intersectionFSM = TrafficIntersectionFSM(this, coroutineScope)
     private var _currentName: String
     private var _current: TrafficLightContext
     private val _counter = AtomicLong(1)
@@ -43,8 +48,9 @@ class TrafficIntersectionService(
             addTrafficLight(it.name, it)
             order.add(it.name)
         }
-        sendToChannel(stateChannel, _state, Dispatchers.Main)
-        sendToChannel(stoppedChannel, _stopped, Dispatchers.Main)
+
+        sendToChannel(stateChannel, _state, uiCoroutineScope)
+        sendToChannel(stoppedChannel, _stopped, uiCoroutineScope)
     }
 
     override fun changeAmberTimeout(value: Long) {
@@ -75,7 +81,7 @@ class TrafficIntersectionService(
     val currentState: IntersectionStates get() = intersectionFSM.currentState
 
     override fun addTrafficLight(name: String, trafficLight: TrafficLightEventHandler) {
-        val fsm = TrafficLightFSM(trafficLight)
+        val fsm = TrafficLightFSM(trafficLight, coroutineScope)
         stateMachines[name] = fsm
         trafficLightData[name] = trafficLight
     }
@@ -87,7 +93,7 @@ class TrafficIntersectionService(
         val fsm = stateMachines[name]
         requireNotNull(fsm) { "Expected to find TrafficLightFSM:$name" }
         fsm.stop()
-        sharedFlowToChannel(trafficLight.stopped, stoppedChannel)
+        sharedFlowToChannel(trafficLight.stopped, stoppedChannel, coroutineScope)
         logger.info { "startTrafficLight:$name:end" }
     }
 
